@@ -5,6 +5,6 @@
     "asset": "bastion.x86_64",
     "rename": "bastion"
   },
-  "expose": { "hostname_label": "block", "port": 7681 },
-  "cmd": ["bastion", "serve", "--port", "7681", "--bind", "0.0.0.0"]
+  "expose": { "hostname_label": "block", "port": 7682 },
+  "cmd": ["bastion", "serve", "--port", "7682", "--bind", "0.0.0.0"]
 }
