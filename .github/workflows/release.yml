@@ -78,15 +78,21 @@ jobs:
           find dist -type f -exec cp {} release/ \;
           ls -la release
 
-      - name: Publish GitHub release
+      - name: Publish GitHub release (rerun-safe)
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --notes "Built from ${GITHUB_SHA}" \
-            release/*
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release $TAG already exists; re-uploading assets with --clobber"
+            gh release upload "$TAG" release/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes "Built from ${GITHUB_SHA}" \
+              --repo "$GITHUB_REPOSITORY" \
+              release/*
+          fi
 
   crates-io:
     needs: build
