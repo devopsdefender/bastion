@@ -1,0 +1,41 @@
+name: Deploy to DD
+
+# Manual-only: deploy a previously-released bastion binary to existing
+# DD agents. No automatic fire on tag push — the release.yml workflow
+# builds and publishes the artifact; this workflow pushes it onto a
+# specific DD agent when the maintainer asks for it.
+#
+# The dd-deploy composite action is pinned to a specific devopsdefender/dd
+# SHA rather than @main so a change upstream can't hijack this deploy.
+
+on:
+  workflow_dispatch:
+    inputs:
+      vm_name:
+        description: 'Target DD agent vm_name (e.g. dd-local-prod, dd-local-preview)'
+        required: true
+        default: 'dd-local-preview'
+      cp_url:
+        description: 'DD control-plane URL (e.g. https://app.devopsdefender.com)'
+        required: true
+        default: 'https://app.devopsdefender.com'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy bastion to ${{ inputs.vm_name }}
+        # Pinned to a specific DD commit SHA — don't float on @main.
+        # Bump this deliberately after auditing dd-deploy action.yml
+        # when DD updates it.
+        uses: devopsdefender/dd/.github/actions/dd-deploy@1b6199e8e7d2cf028c65480294eb7609c5d2874e
+        with:
+          cp-url: ${{ inputs.cp_url }}
+          vm-name: ${{ inputs.vm_name }}
+          workload: ./workload.json
