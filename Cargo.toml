@@ -1,6 +1,6 @@
 [package]
 name = "bastion-term"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Block-aware web terminal: persistent shells, OSC 133 command segmentation, xterm.js front-end."
 license = "MIT"
